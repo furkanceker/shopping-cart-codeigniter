@@ -39,54 +39,36 @@
         <header class="bg-dark py-5">
             <div class="container px-4 px-lg-5 my-5">
                 <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">SEPET</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Sepetindeki Ürünler</p>
+                    <h1 class="display-4 fw-bolder">ALIŞVERİŞİ TAMAMLA</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">Ödemeyi Tamamla ve Hediye Bonus Kazan</p>
                 </div>
             </div>
         </header>
         <!-- Section-->
         <section class="py-5">
             <div class="container px-4 px-lg-5 mt-5">
-                <div class="row justify-content-center">  
-                    <?php if(count($this->cart->contents())>0) { ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Ürün Adı</th>
-                                    <th>Ürün Adet</th>
-                                    <th>Ürün Fiyat</th>
-                                    <th>Toplam Fiyat</th>
-                                    <th>İşlem</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($this->cart->contents() as $product){ ?>
-                                <tr>
-                                    <td><?= $product['name'] ?></td>
-                                    <td>
-                                        <?= $product['qty'] ?>
-                                        <input type="number" class="form-control col-md-2" placeholder="Adet" name="adet" id="<?= $product['rowid'] ?>">
-                                        <button class="btn btn-primary update" type="button" name="update" data-id="<?= $product['rowid'] ?>">Güncelle</button>
-                                    </td>
-                                    <td><?= $product['price'] ?>₺</td>
-                                    <td><?= $product['subtotal'] ?>₺</td>
-                                    <td><a href="<?php echo base_url('cart/delete/'.$product['rowid']) ?>" onclick="return confirm('Ürün Sepetten Çıkarılsın Mı?')" class="btn btn-danger">Sepetten Çıkart</a></td>
-                                </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                <div class="row justify-content-center"> 
+                    <form action="<?= base_url('creditcard/completeorder') ?>" method="post">
+                        <div class="form-group">
+                            <input type="text" class="form-control mb-3" name="isim" placeholder="Ad Soyad">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control mb-3" name="tel" placeholder="Telefon">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control mb-3" name="eposta" placeholder="E-Posta">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control mb-3" name="adres" placeholder="Adres">
+                        </div>
                         <div align="right">
-                            <a href="<?php echo base_url('cart/empty') ?>" onclick="return confirm('Ürün Sepetten Çıkarılsın Mı?')"  class="btn btn-danger">Sepeti Boşalt</a>
-                            <a href="<?= base_url('cart/complete') ?>" class="btn btn-success">Alışverişi Tamamla</a>
+                            <a href="<?= base_url('cart') ?>" class="btn btn-danger">Geri Dön</a>
+                            <button type="submit" class="btn btn-success">Ödeme Yap</button>
                             <h2>GENEL TOPLAM : <?= $this->cart->total(); ?>₺</h2>
                         </div>
-                    </div>
-                    <?php } else { ?>
-                        <h3 class="alert alert-danger text-center">Sepette Ürün Yok</h3>
-                    <?php } ?>
+                    </form>
+
                 </div>
-				
             </div>
         </section>
         <!-- Footer-->

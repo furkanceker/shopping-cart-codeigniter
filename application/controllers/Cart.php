@@ -60,5 +60,9 @@ class Cart extends CI_Controller{
             }
         }
     }
+
+    public function complete(){
+        $this->load->view('complete_view');
+    }
 }
 ?>
