@@ -28,7 +28,7 @@
                     <form class="d-flex">
                         <button class="btn btn-outline-dark" type="submit">
                             <i class="bi-cart-fill me-1"></i>
-                            <a href="<?= base_url('cart') ?>">Sepet</a> 
+                             <a href="<?= base_url('cart') ?>">Sepet</a> 
                             <span class="badge bg-dark text-white ms-1 rounded-pill"><?= count($this->cart->contents()) ?></span>
                         </button>
                     </form>
@@ -39,39 +39,51 @@
         <header class="bg-dark py-5">
             <div class="container px-4 px-lg-5 my-5">
                 <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Ürün Listesi</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">En Yeni Ürünler Fenix Shop'da</p>
+                    <h1 class="display-4 fw-bolder">SEPET</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">Sepetindeki Ürünler</p>
                 </div>
             </div>
         </header>
         <!-- Section-->
         <section class="py-5">
             <div class="container px-4 px-lg-5 mt-5">
-                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">  
-				<?php foreach($product as $prod) { ?> 
-				<div class="col mb-5">
-                        <div class="card h-100">
-                            <!-- Product image-->
-                            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
-                            <!-- Product details-->
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <!-- Product name-->
-                                    <h5 class="fw-bolder"><?= $prod->title ?></h5>
-                                    <!-- Product price-->
-                                    <?= $prod->price ?>₺
-                                </div>
-                            </div>
-                            <!-- Product actions-->
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center">
-									<input type="number" class="form-control" placeholer="Ürün Adet" id="<?= $prod->id ?>">
-									<button type="button" name="add" class="btn btn-success add" data-name="<?= $prod->title ?>" data-id="<?= $prod->id ?>" data-price="<?= $prod->price ?>">Sepete Ekle</button>
-								</div>
-                            </div>
+                <div class="row justify-content-center">  
+                    <?php if(count($this->cart->contents())>0) { ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ürün Adı</th>
+                                    <th>Ürün Adet</th>
+                                    <th>Ürün Fiyat</th>
+                                    <th>Toplam Fiyat</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach($this->cart->contents() as $product){ ?>
+                                <tr>
+                                    <td><?= $product['name'] ?></td>
+                                    <td>
+                                        <?= $product['qty'] ?>
+                                        <input type="number" class="form-control col-md-2" placeholder="Adet" name="adet" id="<?= $product['rowid'] ?>">
+                                        <button class="btn btn-primary update" type="button" name="update" data-id="<?= $product['rowid'] ?>">Güncelle</button>
+                                    </td>
+                                    <td><?= $product['price'] ?>₺</td>
+                                    <td><?= $product['subtotal'] ?>₺</td>
+                                    <td><a href="<?php echo base_url('cart/delete/'.$product['rowid']) ?>" onclick="return confirm('Ürün Sepetten Çıkarılsın Mı?')" class="btn btn-danger">Sepetten Çıkart</a></td>
+                                </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                        <div align="right">
+                            <a href="<?php echo base_url('cart/empty') ?>" onclick="return confirm('Ürün Sepetten Çıkarılsın Mı?')"  class="btn btn-danger">Sepeti Boşalt</a>
+                            <h2>GENEL TOPLAM : <?= $this->cart->total(); ?>₺</h2>
                         </div>
                     </div>
-					<?php } ?>
+                    <?php } else { ?>
+                        <h3 class="alert alert-danger text-center">Sepette Ürün Yok</h3>
+                    <?php } ?>
                 </div>
 				
             </div>
@@ -85,33 +97,27 @@
         <!-- Core theme JS-->
         <!-- <script src="js/scripts.js"></script> -->
 
-		<script>
+        <script>
 			$(document).ready(function(){
-				$('.add').click(function(){
+				$('.update').click(function(){
 					var id = $(this).data('id')
-					var name = $(this).data('name')
-					var price = $(this).data('price')
 					var adet = $('#'+id).val()
 					/* var total = price * adet */
 					if(adet != '' && adet > 0){
 						$.ajax({
 							type : 'POST',
-							url : "<?= base_url('cart/add') ?>",
+							url : "<?= base_url('cart/update') ?>",
 							data : {
 								id:id,
-								name:name,
-								price:price,
 								adet:adet
 							},
 							success : function(data){
-								if($.trim(data)=="yok"){
-									alert("Ürün Mevcut Değil")
-								}else if($.trim(data)=="adetbelirtin"){
+								if($.trim(data)=="adetbelirtin"){
 									alert("Lütfen Adet Girin")
 								}
 								else{
-									alert("Ürün Sepete Eklendi")
-									window.location.href = '<?= base_url('cart') ?>'
+									alert("Ürün Adeti Güncellendi")
+									window.location.reload()
 								}
 							}
 						})

@@ -2,7 +2,7 @@
 
 class Cart extends CI_Controller{
     public function index(){
-        echo "Sepet";
+        $this->load->view('cart_view');
     }
     public function add(){
         if($_POST){
@@ -24,6 +24,39 @@ class Cart extends CI_Controller{
                 }
             } else {
                 echo "adetbelirtin";
+            }
+        }
+    }
+
+    public function delete($id){
+        if(!$id){
+            redirect(base_url());
+        }
+        $data = array(
+            'rowid'=>$id,
+            'qty'=>0
+        );
+        $this->cart->update($data);
+        redirect(base_url('cart'));
+    }
+    public function empty(){
+        $this->cart->destroy();
+        redirect(base_url());
+    }
+
+    public function update(){
+        if($_POST){
+            $id = $this->input->post('id');
+            $adet = $this->input->post('adet');
+
+            if($adet > 0){
+                $data = array(
+                    "rowid"=>$id,
+                    "qty"=>$adet
+                );
+                $this->cart->update($data);
+            }else{
+                echo 'adetbelirtin';
             }
         }
     }
