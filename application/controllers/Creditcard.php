@@ -137,6 +137,61 @@ class Creditcard extends CI_Controller{
             }
         }
     }
+    public function result(){
+
+        $post = $_POST;
+        $sipariskodu = @$post['merchant_oid'];
+        ####################### DÜZENLEMESİ ZORUNLU ALANLAR #######################
+        #
+        ## API Entegrasyon Bilgileri - Mağaza paneline giriş yaparak BİLGİ sayfasından alabilirsiniz.
+    
+      
+        $merchant_key 	= 'dKsU2NxHwb96ZEfS';
+        $merchant_salt	= '9Scs5unkBtxg83sL';
+        ###########################################################################
+    
+        ####### Bu kısımda herhangi bir değişiklik yapmanıza gerek yoktur. #######
+        #
+        ## POST değerleri ile hash oluştur.
+        $hash = base64_encode( hash_hmac('sha256', @$post['merchant_oid'].$merchant_salt.@$post['status'].@$post['total_amount'], $merchant_key, true) );
+        #
+        ## Oluşturulan hash'i, paytr'dan gelen post içindeki hash ile karşılaştır (isteğin paytr'dan geldiğine ve değişmediğine emin olmak için)
+        ## Bu işlemi yapmazsanız maddi zarara uğramanız olasıdır.
+        if( $hash != @$post['hash'] )
+            die('PAYTR notification failed: bad hash');
+        ###########################################################################
+    
+        ## BURADA YAPILMASI GEREKENLER
+        ## 1) Siparişin durumunu $post['merchant_oid'] değerini kullanarak veri tabanınızdan sorgulayın.
+        ## 2) Eğer sipariş zaten daha önceden onaylandıysa veya iptal edildiyse  echo "OK"; exit; yaparak sonlandırın.
+    
+        /* Sipariş durum sorgulama örnek
+            $durum = SQL
+           if($durum == "onay" || $durum == "iptal"){
+                echo "OK";
+                exit;
+            }
+         */
+    
+        if( @$post['status'] == 'success' ) { ## Ödeme Onaylandı
+    
+            $this->common_model->guncelle(["sipariskodu" => $sipariskodu],'siparisler',['durum' => 1]);
+    
+            //sms mail gönderim işlemi
+    
+        } else { ## Ödemeye Onay Verilmedi
+    
+            $this->common_model->guncelle(["sipariskodu" => $sipariskodu],'siparisler',['durum' => 3,'hatakodu' => @$post['failed_reason_code'],'hatamesaj' => @$post['failed_reason_msg'] ]);
+    
+            // sms olarak gönderebileceğiniz mesaj = $post['failed_reason_msg']
+    
+        }
+    
+        ## Bildirimin alındığını PayTR sistemine bildir.
+        echo "OK";
+        exit;
+    
+        }
 }
 
 ?>

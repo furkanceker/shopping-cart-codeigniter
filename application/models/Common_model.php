@@ -10,4 +10,7 @@ class Common_model extends CI_Model{
     public function ekle($table,$data){
         return $this->db->insert($table,$data);
     }
+    public function guncelle($where,$table,$data){
+        return $this->db->where($where)->update($table,$data);
+    }
 }
