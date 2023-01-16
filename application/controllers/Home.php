@@ -5,6 +5,7 @@ class Home extends CI_Controller {
 
 	public function index()
 	{
-		$this->load->view('home_view');
+		$viewData['product'] = $this->common_model->getAll('urunler');
+		$this->load->view('home_view',$viewData);
 	}
 }
